@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -102,7 +102,7 @@ vim.g.have_nerd_font = false
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -146,7 +146,9 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.listchars = { trail = '·', nbsp = '␣' }
+
+-- 4 space master race
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -156,6 +158,14 @@ vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
+
+vim.o.mousemoveevent = true
+
+-- Close current window
+vim.keymap.set('n', '<C-x>', '<cmd>close<cr>')
+
+-- Open Horizontal split of terminal window (might be a dependency but I don't care)
+-- vim.keymap.set('n', '<leader>h', '<cmd>sp<cr><cmd>term<cr>')
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -173,13 +183,13 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 --
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
-vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 -- TIP: Disable arrow keys in normal mode
--- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
--- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
--- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
--- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
+vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
+vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
+vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
@@ -228,6 +238,142 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
+  -- START of custom plugins
+
+  'https://gitlab.com/HiPhish/rainbow-delimiters.nvim.git', -- make inline parenthesis different colors
+
+  { -- autoclose parenthesis and brackets
+    'm4xshen/autoclose.nvim',
+    opts = {},
+  },
+
+  { -- glorious tabs
+    'romgrk/barbar.nvim',
+    dependencies = {
+      'lewis6991/gitsigns.nvim', -- OPTIONAL: for git status
+      'nvim-tree/nvim-web-devicons', -- OPTIONAL: for file icons
+    },
+    init = function()
+      vim.g.barbar_auto_setup = false
+      local map = vim.api.nvim_set_keymap
+      local opts = { noremap = true, silent = true }
+
+      -- Move to previous/next
+      map('n', '<S-Tab>', '<Cmd>BufferPrevious<CR>', opts)
+      map('n', '<Tab>', '<Cmd>BufferNext<CR>', opts)
+
+      -- Re-order to previous/next
+      map('n', '<Tab-<>', '<Cmd>BufferMovePrevious<CR>', opts)
+      map('n', '<Tab->>', '<Cmd>BufferMoveNext<CR>', opts)
+
+      -- Close buffer
+      map('n', '<leader>x', '<Cmd>BufferClose<CR>', opts)
+
+      -- Wipeout buffer
+      --                 :BufferWipeout
+
+      -- Close commands
+      --                 :BufferCloseTabllButCurrent
+      --                 :BufferCloseTabllButPinned
+      --                 :BufferCloseTabllButCurrentOrPinned
+      --                 :BufferCloseBuffersLeft
+      --                 :BufferCloseBuffersRight
+
+      -- Magic buffer-picking mode
+      map('n', '<C-p>', '<Cmd>BufferPick<CR>', opts)
+      map('n', '<C-s-p>', '<Cmd>BufferPickDelete<CR>', opts)
+
+      -- Sort automatically by...
+      map('n', '<Space>bb', '<Cmd>BufferOrderByBufferNumber<CR>', opts)
+      map('n', '<Space>bn', '<Cmd>BufferOrderByName<CR>', opts)
+      map('n', '<Space>bd', '<Cmd>BufferOrderByDirectory<CR>', opts)
+      map('n', '<Space>bl', '<Cmd>BufferOrderByLanguage<CR>', opts)
+      map('n', '<Space>bw', '<Cmd>BufferOrderByWindowNumber<CR>', opts)
+
+      -- Other:
+      -- :BarbarEnable - enables barbar (enabled by default)
+      -- :BarbarDisable - very bad command, should never be used
+    end,
+    opts = {
+      -- lazy.nvim will automatically call setup for you. put your options here, anything missing will use the default:
+      animation = true,
+      insert_at_start = true,
+    },
+    version = '^1.0.0', -- optional: only update when a new 1.x version is released
+  },
+
+  { -- documentation view
+    'soulis-1256/eagle.nvim',
+    init = function()
+      vim.keymap.set('n', '<S-k>', '<Cmd>EagleWin<CR>', { noremap = true, silent = true })
+    end,
+    opts = {
+      keyboard_mode = true,
+    },
+  },
+
+  { -- in-editor terminal
+    'akinsho/toggleterm.nvim',
+    config = function()
+      require('toggleterm').setup {
+        size = 10, -- default height/width
+        open_mapping = [[<leader>h]], -- key to toggle terminal
+        direction = 'horizontal', -- or "vertical" | "float"
+      }
+    end,
+  },
+
+  {
+    'vidocqh/auto-indent.nvim',
+    opts = {},
+  },
+
+  {
+    'numToStr/Comment.nvim',
+    opts = {
+      -- add any options here
+    },
+  },
+
+  {
+    'goolord/alpha-nvim',
+    dependencies = {
+      'echasnovski/mini.icons',
+      'nvim-lua/plenary.nvim',
+    },
+    config = function()
+      local alpha = require 'alpha'
+      local theme = 'alpha.themes.theta'
+      local dashboard = require(theme)
+
+      -- Set header
+      dashboard.header.val = {
+        [[                      ___                              ]],
+        [[                   .-'   `'.                           ]],
+        [[                  /         \                          ]],
+        [[                  |         ;                          ]],
+        [[                  |         |           ___.--,        ]],
+        [[         _.._     |0) ~ (0) |    _.---'`__.-( (_..     ]],
+        [[  __.--'`_.. '.__.\    '--. \_.-' ,.--'`     `""`      ]],
+        [[ ( ,.--'`   ',__ /./;   ;, '.__.'`    __               ]],
+        [[ _`) )  .---.__.' / |   |\   \__..--""  """--.,_       ]],
+        [[`---' .'.''-._.-'`_./  /\ '.  \ _.-~~~````~~~-._`-.__.']],
+        [[      | |  .' _.-' |  |  \  \  '.               `~---` ]],
+        [[       \ \/ .'     \  \   '. '-._)                     ]],
+        [[        \/ /        \  \    `=.__`~-.                  ]],
+        [[   nvim / /\         `) )    / / `"".`\                ]],
+        [[  , _.-'.'\ \        / /    ( (     / /                ]],
+        [[   `--~`   ) )    .-'.'      '.'.  | (                 ]],
+        [[          (/`    ( (`          ) )  '-;                ]],
+        [[           `      '-;         (-'                      ]],
+      }
+
+      alpha.setup(dashboard.config)
+    end,
+  },
+
+  -- END of custom plugins
+
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
@@ -964,6 +1110,3 @@ require('lazy').setup({
     },
   },
 })
-
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
