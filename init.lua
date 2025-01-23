@@ -146,10 +146,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { trail = '·', nbsp = '␣' }
-
--- 4 space master race
-
+vim.opt.listchars = { tab = '▏ ', trail = '·', nbsp = '␣' }
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
 
@@ -855,6 +852,7 @@ require('lazy').setup({
         lua = { 'stylua' },
         python = { 'black' },
         html = { 'djlint' },
+        javascript = { 'prettier' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
