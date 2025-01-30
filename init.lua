@@ -93,6 +93,9 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+-- for color highlighting
+vim.opt.termguicolors = true
+
 -- [[ Setting options ]]
 -- See `:help vim.opt`
 -- NOTE: You can change these options as you wish!
@@ -320,10 +323,11 @@ require('lazy').setup({
     end,
   },
 
-  {
-    'vidocqh/auto-indent.nvim',
-    opts = {},
-  },
+  -- disabled due to weird indenting issues
+  -- {
+  --   'vidocqh/auto-indent.nvim',
+  --   opts = {},
+  -- },
 
   {
     'numToStr/Comment.nvim',
@@ -367,6 +371,13 @@ require('lazy').setup({
 
       alpha.setup(dashboard.config)
     end,
+  },
+
+  {
+    'brenoprata10/nvim-highlight-colors',
+    opts = {
+      render = 'virtual',
+    },
   },
   -- END of custom plugins
 
@@ -853,6 +864,8 @@ require('lazy').setup({
         python = { 'black' },
         html = { 'djlint' },
         javascript = { 'prettier' },
+        css = { 'prettier' },
+        c = { 'clang-format' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
