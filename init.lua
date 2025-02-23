@@ -319,15 +319,21 @@ require('lazy').setup({
         size = 10, -- default height/width
         open_mapping = [[<leader>h]], -- key to toggle terminal
         direction = 'horizontal', -- or "vertical" | "float"
+        autochdir = true,
       }
     end,
   },
 
   -- disabled due to weird indenting issues
-  -- {
-  --   'vidocqh/auto-indent.nvim',
-  --   opts = {},
-  -- },
+  {
+    'vidocqh/auto-indent.nvim',
+    opts = {
+      lightmode = false,
+      indentexpr = function(lnum)
+        return require('nvim-treesitter.indent').get_indent(lnum)
+      end,
+    },
+  },
 
   {
     'numToStr/Comment.nvim',
