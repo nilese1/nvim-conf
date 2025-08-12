@@ -385,6 +385,48 @@ require('lazy').setup({
       render = 'virtual',
     },
   },
+  {
+    'iamcco/markdown-preview.nvim',
+    cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
+    build = 'cd app && yarn install',
+    init = function()
+      vim.g.mkdp_filetypes = { 'markdown' }
+    end,
+    ft = { 'markdown' },
+  },
+  {
+    'github/copilot.vim',
+    init = function()
+      -- remap tab to copilot
+      vim.g.copilot_no_tab_map = true
+      vim.api.nvim_set_keymap('i', '<C-J>', 'copilot#Accept("<CR>")', { silent = true, expr = true })
+
+      -- disable on startup
+      vim.g.copilot_enabled = false
+      -- toggle keymap
+      vim.keymap.set('n', '<leader>ct', function()
+        vim.g.copilot_enabled = not vim.g.copilot_enabled
+        if vim.g.copilot_enabled then
+          vim.cmd 'Copilot enable'
+        else
+          vim.cmd 'Copilot disable'
+        end
+      end, { desc = '[C]opilot [T]oggle' })
+    end,
+  },
+  {
+    'akinsho/git-conflict.nvim',
+    version = '*',
+    config = true,
+    init = function()
+      vim.keymap.set('n', '<leader>ghn', '<Plug>(git-conflict-ours)', { desc = 'Git [H]unk [N]ext' })
+      vim.keymap.set('n', '<leader>gho', '<Plug>(git-conflict-theirs)', { desc = 'Git [H]unk [O]urs' })
+      vim.keymap.set('n', '<leader>ghb', '<Plug>(git-conflict-both)', { desc = 'Git [H]unk [B]oth' })
+      vim.keymap.set('n', '<leader>ghd', '<Plug>(git-conflict-none)', { desc = 'Git [H]unk [D]elete' })
+      vim.keymap.set('n', '<leader>ghj', '<Plug>(git-conflict-next-conflict)', { desc = 'Git [H]unk [J]ump Next' })
+      vim.keymap.set('n', '<leader>ghk', '<Plug>(git-conflict-prev-conflict)', { desc = 'Git [H]unk [K]ump Previous' })
+    end,
+  },
   -- END of custom plugins
 
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
@@ -785,6 +827,13 @@ require('lazy').setup({
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
         --
+        -- pylsp = {
+        --   plugins {
+        --     autopep8 {
+        --       enabled = false
+        --     }
+        --   }
+        -- },
 
         lua_ls = {
           -- cmd = { ... },
@@ -819,16 +868,14 @@ require('lazy').setup({
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for ts_ls)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
+        function(server_name)
+          local server = servers[server_name] or {}
+          -- This handles overriding only values explicitly passed
+          -- by the server configuration above. Useful when disabling
+          -- certain features of an LSP (for example, turning off formatting for ts_ls)
+          server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+          require('lspconfig')[server_name].setup(server)
+        end,
       }
     end,
   },
