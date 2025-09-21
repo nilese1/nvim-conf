@@ -320,6 +320,7 @@ require('lazy').setup({
         open_mapping = [[<leader>h]], -- key to toggle terminal
         direction = 'horizontal', -- or "vertical" | "float"
         autochdir = true,
+        insert_mappings = false,
       }
     end,
   },
