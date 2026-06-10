@@ -27,6 +27,8 @@ vim.pack.add({
 
 	"https://github.com/romgrk/barbar.nvim",
 
+	"https://github.com/nvim-mini/mini.nvim",
+
 	-- LSP CONFIGURATION
 	"https://github.com/williamboman/mason.nvim",
 	"https://github.com/williamboman/mason-lspconfig.nvim",
@@ -51,6 +53,6 @@ require("plugins.autocomplete")
 require("plugins.guess-indent")
 require("plugins.ibl")
 require("plugins.barbar")
+require("plugins.mini")
 
 require("plugins.mason")
-
